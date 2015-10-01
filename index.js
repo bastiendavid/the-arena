@@ -8,6 +8,7 @@ var io = require('socket.io')(http);
 // Serve static content
 server.use(express.static(__dirname + '/frontend'));
 server.use("/jquery", express.static(__dirname + '/node_modules/jquery/dist'));
+server.use("/phaser", express.static(__dirname + '/node_modules/phaser/dist'));
 
 
 // sockets
@@ -19,6 +20,11 @@ io.on('connection', function(socket){
     
     socket.on('message', function(message) {
         io.emit('message', message);
+    });
+	
+	socket.on('position', function(position) {
+		console.log(position);
+		io.emit('position', position);
     });
 });
 
