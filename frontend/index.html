@@ -51,7 +51,9 @@
         socket.emit('register', playerName);
         $('#play-form').hide();
         $('#spectate-form').hide();
-        playGame(playerName);
+
+        var game = new Game(socket);
+        game.play(playerName);
         return false;
     });
 
@@ -59,7 +61,8 @@
     $('#spectate-form').submit(function () {
         $('#play-form').hide();
         $('#spectate-form').hide();
-        spectateGame();
+        var game = new Game(socket);
+        game.spectate();
         return false;
     });
     </script>

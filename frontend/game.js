@@ -1,143 +1,162 @@
 <!-- phaser -->
-var game;
-var player;
-var facing = 'left';
-var jumpTimer = 0;
-var cursors;
-var jumpButton;
-var bg;
-var spectateEvents = [];
 
-function playGame(playerName) {
-    game = new Phaser.Game(800, 600, Phaser.AUTO, 'game', {
-        preload: preload,
-        create: create,
-        update: update
-    });
-    socket.on('event', function (event) {
-        spectateEvents.push(event);
-    });
+function Game(socket) {
+    this.socket = socket;
+    this.facing = 'left';
+    this.jumpTimer = 0;
+    this.storedEvents = [];
 }
 
-function spectateGame() {
-    game = new Phaser.Game(800, 600, Phaser.AUTO, 'game', {
-        preload: preload,
-        create: create,
-        update: updateSpectate
+Game.prototype.play = function(playerName) {
+    var self = this;
+    this.game = new Phaser.Game(800, 600, Phaser.AUTO, 'game', {
+        preload: function() {
+            self.preload();
+        },
+        create: function() {
+            self.create();
+        },
+        update: function() {
+            self.update();
+        }
     });
-    socket.on('event', function (event) {
-        spectateEvents.push(event);
+    this.listenEvents();
+};
+
+Game.prototype.spectate = function () {
+    var self = this;
+    this.game = new Phaser.Game(800, 600, Phaser.AUTO, 'game', {
+        preload: function() {
+            self.preload();
+        },
+        create: function() {
+            self.create();
+        },
+        update: function() {
+            self.updateSpectate();
+        }
     });
-}
+    this.listenEvents();
+};
 
-function preload() {
-    game.load.spritesheet('dude', 'assets/dude.png', 32, 48);
-    game.load.image('background', 'assets/sky1.png');
-}
+Game.prototype.listenEvents = function () {
+    var self = this;
+    this.socket.on('event', function (event) {
+        self.storedEvents.push(event);
+    });
+};
 
-function create() {
-    game.physics.startSystem(Phaser.Physics.ARCADE);
+Game.prototype.preload = function () {
+    this.game.load.spritesheet('dude', 'assets/dude.png', 32, 48);
+    this.game.load.image('background', 'assets/sky1.png');
+};
 
-    bg = game.add.tileSprite(0, 0, 800, 600, 'background');
+Game.prototype.create = function () {
+    this.game.physics.startSystem(Phaser.Physics.ARCADE);
+    this.game.physics.arcade.gravity.y = 300;
 
-    game.physics.arcade.gravity.y = 300;
+    var bg = this.game.add.tileSprite(0, 0, 800, 600, 'background');
 
-    player = game.add.sprite(32, 320, 'dude');
-    game.physics.enable(player, Phaser.Physics.ARCADE);
+    this.addPlayer();
 
-    player.body.collideWorldBounds = true;
-    player.body.gravity.y = 1300;
-    player.body.maxVelocity.y = 700;
-    player.body.setSize(20, 32, 5, 16);
+    this.cursors = this.game.input.keyboard.createCursorKeys();
+    this.jumpButton = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
+};
 
-    player.animations.add('left', [0, 1, 2, 3], 10, true);
-    player.animations.add('turn', [4], 20, true);
-    player.animations.add('right', [5, 6, 7, 8], 10, true);
+Game.prototype.addPlayer = function () {
+    this.player = this.game.add.sprite(32, 320, 'dude');
+    this.game.physics.enable(this.player, Phaser.Physics.ARCADE);
 
-    cursors = game.input.keyboard.createCursorKeys();
-    jumpButton = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
-}
+    this.player.body.collideWorldBounds = true;
+    this.player.body.gravity.y = 1300;
+    this.player.body.maxVelocity.y = 700;
+    this.player.body.setSize(20, 32, 5, 16);
 
-function update() {
+    this.player.animations.add('left', [0, 1, 2, 3], 10, true);
+    this.player.animations.add('turn', [4], 20, true);
+    this.player.animations.add('right', [5, 6, 7, 8], 10, true);
+};
+
+Game.prototype.update = function () {
     // game.physics.arcade.collide(player, layer);
 
     var postEvent;
-    playNextEvent();
+    this.playNextEvent();
 
-    if (cursors.left.isDown)
+    if (this.cursors.left.isDown)
     {
         postEvent = "left";
     }
 
-    if (cursors.right.isDown)
+    if (this.cursors.right.isDown)
     {
         postEvent = "right";
     }
 
-    if (jumpButton.isDown && player.body.onFloor() && game.time.now > jumpTimer)
+    if (this.jumpButton.isDown && this.player.body.onFloor() && this.game.time.now > this.jumpTimer)
     {
         postEvent = "jump";
     }
 
     // Send event to server
     if (postEvent != undefined) {
-        socket.emit('event', postEvent);
+        this.socket.emit('event', postEvent);
     }
-}
+};
 
-function updateSpectate() {
-    playNextEvent();
-}
+Game.prototype.updateSpectate = function (first_argument) {
+    this.playNextEvent();
+};
 
-function playNextEvent() {
-    player.body.velocity.x = 0;
+Game.prototype.playNextEvent = function () {
+    this.player.body.velocity.x = 0;
     var event;
-    if (spectateEvents.length > 0) {
-        event = spectateEvents.splice(0,1);
+    if (this.storedEvents.length > 0) {
+        event = this.storedEvents.splice(0,1);
     }
 
     if (event == "left")
     {
-        player.body.velocity.x = -300;
+        this.player.body.velocity.x = -300;
 
-        if (facing != 'left')
+        if (this.facing != 'left')
         {
-            player.animations.play('left');
-            facing = 'left';
+            this.player.animations.play('left');
+            this.facing = 'left';
         }
     }
     else if (event == "right")
     {
-        player.body.velocity.x = 300;
+        this.player.body.velocity.x = 300;
 
-        if (facing != 'right')
+        if (this.facing != 'right')
         {
-            player.animations.play('right');
-            facing = 'right';
+            this.player.animations.play('right');
+            this.facing = 'right';
         }
     }
     else
     {
-        if (facing != 'idle')
+        if (this.facing != 'idle')
         {
-            player.animations.stop();
+            this.player.animations.stop();
 
-            if (facing == 'left')
+            if (this.facing == 'left')
             {
-                player.frame = 0;
+                this.player.frame = 0;
             }
             else
             {
-                player.frame = 5;
+                this.player.frame = 5;
             }
 
-            facing = 'idle';
+            this.facing = 'idle';
         }
     }
 
     if (event == "jump")
     {
-        player.body.velocity.y = -500;
-        jumpTimer = game.time.now + 750;
+        this.player.body.velocity.y = -500;
+        this.jumpTimer = this.game.time.now + 750;
     }
-}
+};
