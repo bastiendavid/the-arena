@@ -6,9 +6,9 @@ var http = require('http').Server(server);
 var io = require('socket.io')(http);
 
 // Serve static content
-server.use(express.static(__dirname + '/frontend'));
-server.use("/jquery", express.static(__dirname + '/node_modules/jquery/dist'));
-server.use("/phaser", express.static(__dirname + '/node_modules/phaser/dist'));
+server.use(express.static(__dirname + '/../client'));
+server.use("/jquery", express.static(__dirname + '/../node_modules/jquery/dist'));
+server.use("/phaser", express.static(__dirname + '/../node_modules/phaser/dist'));
 
 
 // sockets
