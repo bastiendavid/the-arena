@@ -13,18 +13,18 @@ server.use("/phaser", express.static(__dirname + '/node_modules/phaser/dist'));
 
 // sockets
 io.on('connection', function(socket){
-    console.log('a user connected');  
+    console.log('a user connected');
     socket.on('user', function(username) {
         io.emit('message', username + ' entered the room');
     })
-    
+
     socket.on('message', function(message) {
         io.emit('message', message);
     });
-	
-	socket.on('position', function(position) {
-		console.log(position);
-		io.emit('position', position);
+
+    socket.on('event', function(event) {
+        console.log(event);
+        io.emit('event', event);
     });
 });
 
