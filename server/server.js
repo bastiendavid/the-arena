@@ -4,6 +4,7 @@ var express = require('express');
 var server = express();
 var http = require('http').Server(server);
 var io = require('socket.io')(http);
+var Player = require('./player');
 
 // Serve static content
 server.use(express.static(__dirname + '/../client'));
@@ -24,7 +25,7 @@ io.on('connection', function(socket){
     });
 
     socket.on('register', function(playerName) {
-        players.push(playerName);
+        players.push(new Player(playerName));
         console.log('New player registered: ' + playerName);
         socket.emit('registered', playerName);
     });
