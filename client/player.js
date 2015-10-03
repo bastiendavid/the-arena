@@ -4,7 +4,7 @@ function Player(name, game) {
     this.name = name;
     this.game = game;
 
-    this.player = this.game.add.sprite(32, 320, 'dude');
+    this.player = this.game.add.sprite(32, 32, 'dude');
     this.game.physics.enable(this.player, Phaser.Physics.ARCADE);
 
     this.player.body.collideWorldBounds = true;

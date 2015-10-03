@@ -59,14 +59,22 @@ Game.prototype.listenEvents = function () {
 
 Game.prototype.preload = function () {
     this.game.load.spritesheet('dude', 'assets/dude.png', 32, 48);
-    this.game.load.image('background', 'assets/sky1.png');
+    this.game.load.image('background_image', 'assets/background.png');
+    this.collisions = this.game.load.tilemap('level', 'assets/level1.json', null, Phaser.Tilemap.TILED_JSON);
 };
 
 Game.prototype.create = function (playerName) {
     this.game.physics.startSystem(Phaser.Physics.ARCADE);
     this.game.physics.arcade.gravity.y = 300;
 
-    var bg = this.game.add.tileSprite(0, 0, 800, 600, 'background');
+    var map = this.game.add.tilemap('level');
+    map.addTilesetImage('background', 'background_image');
+    this.layer = map.createLayer('background');
+    this.layerCol = map.createLayer('collisions');
+    // uncomment to display collisions boxes
+    //this.layerCol.debug = true;
+    map.setCollisionBetween(0, 600, true, 'collisions');
+    this.layer.resizeWorld();
 
     this.addPlayer(playerName);
 
@@ -81,7 +89,7 @@ Game.prototype.addPlayer = function (playerName) {
 };
 
 Game.prototype.update = function () {
-    // game.physics.arcade.collide(player, layer);
+    this.game.physics.arcade.collide(this.currentPlayer.player, this.layerCol);
 
     var postEvent;
     this.playNextEvent();
