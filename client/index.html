@@ -49,7 +49,6 @@
     <!-- Game start -->
     $('#play-form').submit(function () {
         var playerName = $('#name').val();
-        socket.emit('register', playerName);
         $('#play-form').hide();
         $('#spectate-form').hide();
 
