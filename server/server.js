@@ -10,6 +10,7 @@ server.use(express.static(__dirname + '/../client'));
 server.use("/jquery", express.static(__dirname + '/../node_modules/jquery/dist'));
 server.use("/phaser", express.static(__dirname + '/../node_modules/phaser/dist'));
 
+var players = [];
 
 // sockets
 io.on('connection', function(socket){
@@ -22,8 +23,13 @@ io.on('connection', function(socket){
         io.emit('message', message);
     });
 
+    socket.on('register', function(playerName) {
+        players.push(playerName);
+        console.log('New player registered: ' + playerName);
+        socket.emit('registered', playerName);
+    });
+
     socket.on('event', function(event) {
-        console.log(event);
         io.emit('event', event);
     });
 });

@@ -49,11 +49,13 @@
     <!-- Game start -->
     $('#play-form').submit(function () {
         var playerName = $('#name').val();
-        $('#play-form').hide();
-        $('#spectate-form').hide();
-
-        var game = new Game(socket);
-        game.play(playerName);
+        socket.emit('register', playerName);
+        socket.on('registered', function(playerName) {
+            $('#play-form').hide();
+            $('#spectate-form').hide();
+            var game = new Game(socket);
+            game.play(playerName);
+        });
         return false;
     });
 
