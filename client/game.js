@@ -20,6 +20,18 @@ Game.prototype.play = function(playerName) {
         }
     });
     this.listenEvents();
+
+    // send position when requested
+    this.socket.on('request player position', function() {
+        self.sendPlayerPosition();
+    });
+};
+
+Game.prototype.sendPlayerPosition = function () {
+    if (this.currentPlayer == undefined) {
+        return;
+    }
+    this.socket.emit('player position', this.currentPlayer.name, this.currentPlayer.getPosition());
 };
 
 Game.prototype.spectate = function () {

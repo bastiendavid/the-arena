@@ -1,7 +1,7 @@
 'use strict';
 
-function Player(playerName, game) {
-    this.playerName = playerName;
+function Player(name, game) {
+    this.name = name;
     this.game = game;
 
     this.player = this.game.add.sprite(32, 320, 'dude');
@@ -19,6 +19,10 @@ function Player(playerName, game) {
     this.facing = 'left';
     this.jumpTimer = 0;
 }
+
+Player.prototype.getPosition = function () {
+    return this.player.position;
+};
 
 Player.prototype.canJump = function () {
     return this.player.body.onFloor() && this.game.time.now > this.jumpTimer;

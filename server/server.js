@@ -30,6 +30,22 @@ io.on('connection', function(socket){
         socket.emit('registered', playerName);
     });
 
+    // Game communication
+    socket.on('player position', function(playerName, position) {
+        players.forEach(function(player) {
+            if (player.name == playerName) {
+                player.updatePosition(position);
+                return;
+            }
+        });
+    });
+
+    // request players positions every 5 secs
+    setInterval(function() {
+        socket.emit('request player position');
+    }, 5000);
+
+    // send events to players
     socket.on('event', function(event) {
         io.emit('event', event);
     });
