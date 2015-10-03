@@ -2,9 +2,8 @@
 
 function Game(socket) {
     this.socket = socket;
-    this.facing = 'left';
-    this.jumpTimer = 0;
     this.storedEvents = [];
+    this.currentPlayer = undefined;
 }
 
 Game.prototype.play = function(playerName) {
@@ -14,7 +13,7 @@ Game.prototype.play = function(playerName) {
             self.preload();
         },
         create: function() {
-            self.create();
+            self.create(playerName);
         },
         update: function() {
             self.update();
@@ -30,7 +29,7 @@ Game.prototype.spectate = function () {
             self.preload();
         },
         create: function() {
-            self.create();
+            self.create("??");
         },
         update: function() {
             self.updateSpectate();
@@ -51,30 +50,20 @@ Game.prototype.preload = function () {
     this.game.load.image('background', 'assets/sky1.png');
 };
 
-Game.prototype.create = function () {
+Game.prototype.create = function (playerName) {
     this.game.physics.startSystem(Phaser.Physics.ARCADE);
     this.game.physics.arcade.gravity.y = 300;
 
     var bg = this.game.add.tileSprite(0, 0, 800, 600, 'background');
 
-    this.addPlayer();
+    this.addPlayer(playerName);
 
     this.cursors = this.game.input.keyboard.createCursorKeys();
     this.jumpButton = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
 };
 
-Game.prototype.addPlayer = function () {
-    this.player = this.game.add.sprite(32, 320, 'dude');
-    this.game.physics.enable(this.player, Phaser.Physics.ARCADE);
-
-    this.player.body.collideWorldBounds = true;
-    this.player.body.gravity.y = 1300;
-    this.player.body.maxVelocity.y = 700;
-    this.player.body.setSize(20, 32, 5, 16);
-
-    this.player.animations.add('left', [0, 1, 2, 3], 10, true);
-    this.player.animations.add('turn', [4], 20, true);
-    this.player.animations.add('right', [5, 6, 7, 8], 10, true);
+Game.prototype.addPlayer = function (playerName) {
+    this.currentPlayer = new Player(playerName, this.game);
 };
 
 Game.prototype.update = function () {
@@ -93,7 +82,7 @@ Game.prototype.update = function () {
         postEvent = "right";
     }
 
-    if (this.jumpButton.isDown && this.player.body.onFloor() && this.game.time.now > this.jumpTimer)
+    if (this.jumpButton.isDown && this.currentPlayer.canJump())
     {
         postEvent = "jump";
     }
@@ -104,59 +93,15 @@ Game.prototype.update = function () {
     }
 };
 
-Game.prototype.updateSpectate = function (first_argument) {
+Game.prototype.updateSpectate = function () {
     this.playNextEvent();
 };
 
 Game.prototype.playNextEvent = function () {
-    this.player.body.velocity.x = 0;
     var event;
     if (this.storedEvents.length > 0) {
         event = this.storedEvents.splice(0,1);
     }
 
-    if (event == "left")
-    {
-        this.player.body.velocity.x = -300;
-
-        if (this.facing != 'left')
-        {
-            this.player.animations.play('left');
-            this.facing = 'left';
-        }
-    }
-    else if (event == "right")
-    {
-        this.player.body.velocity.x = 300;
-
-        if (this.facing != 'right')
-        {
-            this.player.animations.play('right');
-            this.facing = 'right';
-        }
-    }
-    else
-    {
-        if (this.facing != 'idle')
-        {
-            this.player.animations.stop();
-
-            if (this.facing == 'left')
-            {
-                this.player.frame = 0;
-            }
-            else
-            {
-                this.player.frame = 5;
-            }
-
-            this.facing = 'idle';
-        }
-    }
-
-    if (event == "jump")
-    {
-        this.player.body.velocity.y = -500;
-        this.jumpTimer = this.game.time.now + 750;
-    }
+    this.currentPlayer.update(event);
 };
