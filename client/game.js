@@ -58,8 +58,10 @@ Game.prototype.create = function (playerName) {
 
     this.addPlayer(playerName);
 
-    this.cursors = this.game.input.keyboard.createCursorKeys();
     this.jumpButton = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
+    this.leftButton = this.game.input.keyboard.addKey(Phaser.Keyboard.Q);
+    this.rightButton = this.game.input.keyboard.addKey(Phaser.Keyboard.D);
+
 };
 
 Game.prototype.addPlayer = function (playerName) {
@@ -72,12 +74,12 @@ Game.prototype.update = function () {
     var postEvent;
     this.playNextEvent();
 
-    if (this.cursors.left.isDown)
+    if (this.leftButton.isDown)
     {
         postEvent = "left";
     }
 
-    if (this.cursors.right.isDown)
+    if (this.rightButton.isDown)
     {
         postEvent = "right";
     }
