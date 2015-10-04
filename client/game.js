@@ -2,8 +2,8 @@
 
 function Game(socket) {
     this.socket = socket;
-    this.storedEvents = [];
     this.currentPlayer = undefined;
+    this.playerName = undefined;
 }
 
 Game.prototype.play = function(playerName) {
@@ -53,7 +53,7 @@ Game.prototype.spectate = function () {
 Game.prototype.listenEvents = function () {
     var self = this;
     this.socket.on('event', function (event) {
-        self.storedEvents.push(event);
+        self.currentPlayer.addEvent(event.event);
     });
 };
 
@@ -92,7 +92,7 @@ Game.prototype.update = function () {
     this.game.physics.arcade.collide(this.currentPlayer.player, this.layerCol);
 
     var postEvent;
-    this.playNextEvent();
+    this.currentPlayer.update();
 
     if (this.leftButton.isDown)
     {
@@ -111,19 +111,10 @@ Game.prototype.update = function () {
 
     // Send event to server
     if (postEvent != undefined) {
-        this.socket.emit('event', postEvent);
+        this.socket.emit('event', new Event(this.playerName, postEvent));
     }
 };
 
 Game.prototype.updateSpectate = function () {
-    this.playNextEvent();
-};
-
-Game.prototype.playNextEvent = function () {
-    var event;
-    if (this.storedEvents.length > 0) {
-        event = this.storedEvents.splice(0,1);
-    }
-
-    this.currentPlayer.update(event);
+    this.currentPlayer.update();
 };
