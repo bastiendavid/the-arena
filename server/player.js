@@ -1,7 +1,8 @@
 'use strict';
 
-function Player(name) {
+function Player(name, socket) {
     this.name = name;
+    this.socket = socket;
 }
 
 Player.prototype.updatePosition = function (position) {

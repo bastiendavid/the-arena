@@ -25,9 +25,18 @@ io.on('connection', function(socket){
     });
 
     socket.on('register', function(playerName) {
-        players.push(new Player(playerName));
+        players.push(new Player(playerName, socket));
         console.log('New player registered: ' + playerName);
         socket.emit('registered', playerName);
+    });
+
+    socket.on('disconnect', function() {
+        players.forEach(function(player) {
+            if (player.socket == socket) {
+                console.log('Player disconnected: ' + player.name);
+                return;
+            }
+        });
     });
 
     // Game communication
