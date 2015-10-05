@@ -2,18 +2,37 @@
 
 function Game(socket) {
     this.socket = socket;
-    this.currentPlayer = undefined;
     this.playerName = undefined;
+    this.players = {};
+    var self = this;
+
+    this.socket.on('player list', function(newPlayers) {
+        // add player if it does not exist
+        self.updatePlayers(newPlayers);
+    });
+}
+
+Game.prototype.updatePlayers = function(newPlayers) {
+    var self = this;
+    newPlayers.forEach(function (newPlayer) {
+        if (!self.players[newPlayer.name]) {
+            self.addPlayer(newPlayer);
+            console.log('player registered : ' + newPlayer.name);
+        }
+    });
+    // TODO: remove players that are now longer registered on the server
 }
 
 Game.prototype.play = function(playerName) {
     var self = this;
+    this.playerName = playerName;
     this.game = new Phaser.Game(800, 600, Phaser.AUTO, 'game', {
         preload: function() {
             self.preload();
         },
         create: function() {
-            self.create(playerName);
+            self.create();
+            self.socket.emit('request player list');
         },
         update: function() {
             self.update();
@@ -28,10 +47,10 @@ Game.prototype.play = function(playerName) {
 };
 
 Game.prototype.sendPlayerPosition = function () {
-    if (this.currentPlayer == undefined) {
+    if (this.playerName == undefined) {
         return;
     }
-    this.socket.emit('player position', this.currentPlayer.name, this.currentPlayer.getPosition());
+    this.socket.emit('player position', this.playerName, this.players[this.playerName].getPosition());
 };
 
 Game.prototype.spectate = function () {
@@ -41,7 +60,8 @@ Game.prototype.spectate = function () {
             self.preload();
         },
         create: function() {
-            self.create("??");
+            self.create();
+            self.socket.emit('request player list');
         },
         update: function() {
             self.updateSpectate();
@@ -53,7 +73,7 @@ Game.prototype.spectate = function () {
 Game.prototype.listenEvents = function () {
     var self = this;
     this.socket.on('event', function (event) {
-        self.currentPlayer.addEvent(event.event);
+        self.players[event.playerName].addEvent(event.event);
     });
 };
 
@@ -63,7 +83,7 @@ Game.prototype.preload = function () {
     this.collisions = this.game.load.tilemap('level', 'assets/level1.json', null, Phaser.Tilemap.TILED_JSON);
 };
 
-Game.prototype.create = function (playerName) {
+Game.prototype.create = function () {
     this.game.physics.startSystem(Phaser.Physics.ARCADE);
     this.game.physics.arcade.gravity.y = 300;
 
@@ -76,23 +96,26 @@ Game.prototype.create = function (playerName) {
     map.setCollisionBetween(0, 600, true, 'collisions');
     this.layer.resizeWorld();
 
-    this.addPlayer(playerName);
-
     this.jumpButton = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
     this.leftButton = this.game.input.keyboard.addKey(Phaser.Keyboard.Q);
     this.rightButton = this.game.input.keyboard.addKey(Phaser.Keyboard.D);
 
 };
 
-Game.prototype.addPlayer = function (playerName) {
-    this.currentPlayer = new Player(playerName, this.game);
+Game.prototype.addPlayer = function (player) {
+    var newPlayer = new Player(player.name, this.game);
+    newPlayer.updatePosition(player.position);
+    this.players[newPlayer.name] = newPlayer;
 };
 
 Game.prototype.update = function () {
-    this.game.physics.arcade.collide(this.currentPlayer.player, this.layerCol);
-
     var postEvent;
-    this.currentPlayer.update();
+
+    for (var playerName in this.players) {
+        this.game.physics.arcade.collide(this.players[playerName].player, this.layerCol);
+        this.players[playerName].update();
+    }
+
 
     if (this.leftButton.isDown)
     {
@@ -104,7 +127,7 @@ Game.prototype.update = function () {
         postEvent = "right";
     }
 
-    if (this.jumpButton.isDown && this.currentPlayer.canJump())
+    if (this.jumpButton.isDown && this.players[this.playerName].canJump())
     {
         postEvent = "jump";
     }
@@ -116,5 +139,8 @@ Game.prototype.update = function () {
 };
 
 Game.prototype.updateSpectate = function () {
-    this.currentPlayer.update();
+    for (var playerName in this.players) {
+        this.game.physics.arcade.collide(this.players[playerName].player, this.layerCol);
+        this.players[playerName].update();
+    }
 };

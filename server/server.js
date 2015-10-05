@@ -14,24 +14,24 @@ server.use("/phaser", express.static(__dirname + '/../node_modules/phaser/dist')
 var players = [];
 
 // sockets
-io.on('connection', function(socket){
+function onClientConnect(socket) {
     console.log('a user connected');
-    socket.on('user', function(username) {
+    socket.on('user', function (username) {
         io.emit('message', username + ' entered the room');
     })
 
-    socket.on('message', function(message) {
+    socket.on('message', function (message) {
         io.emit('message', message);
     });
 
-    socket.on('register', function(playerName) {
+    socket.on('register', function (playerName) {
         players.push(new Player(playerName, socket));
         console.log('New player registered: ' + playerName);
         socket.emit('registered', playerName);
     });
 
-    socket.on('disconnect', function() {
-        players.forEach(function(player) {
+    socket.on('disconnect', function () {
+        players.forEach(function (player) {
             if (player.socket == socket) {
                 console.log('Player disconnected: ' + player.name);
                 return;
@@ -39,9 +39,18 @@ io.on('connection', function(socket){
         });
     });
 
+    socket.on('request player list', function(){
+        var playersJSON = [];
+        players.forEach(function (player) {
+            playersJSON.push(player.toJSON());
+        });
+        console.log('request player list: ' + JSON.stringify(playersJSON));
+        socket.emit('player list', playersJSON);
+    });
+
     // Game communication
-    socket.on('player position', function(playerName, position) {
-        players.forEach(function(player) {
+    socket.on('player position', function (playerName, position) {
+        players.forEach(function (player) {
             if (player.name == playerName) {
                 player.updatePosition(position);
                 return;
@@ -50,14 +59,18 @@ io.on('connection', function(socket){
     });
 
     // request players positions every 5 secs
-    setInterval(function() {
+    setInterval(function () {
         socket.emit('request player position');
     }, 5000);
 
     // send events to players
-    socket.on('event', function(event) {
+    socket.on('event', function (event) {
         io.emit('event', event);
     });
+}
+
+io.on('connection', function(socket){
+    onClientConnect(socket);
 });
 
 // start server

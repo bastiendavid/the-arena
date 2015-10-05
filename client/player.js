@@ -25,6 +25,11 @@ Player.prototype.getPosition = function () {
     return this.player.position;
 };
 
+Player.prototype.updatePosition = function(position) {
+    this.player.position.x = position.x;
+    this.player.position.y = position.y;
+}
+
 Player.prototype.addEvent = function (event) {
     this.storedEvents.push(event);
 };
