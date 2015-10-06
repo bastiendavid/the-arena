@@ -14,6 +14,14 @@ server.use("/phaser", express.static(__dirname + '/../node_modules/phaser/dist')
 var players = [];
 
 // sockets
+function playersToJSON() {
+    var playersJSON = [];
+    players.forEach(function (player) {
+        playersJSON.push(player.toJSON());
+    });
+    return playersJSON;
+}
+
 function onClientConnect(socket) {
     console.log('a user connected');
     socket.on('user', function (username) {
@@ -28,6 +36,7 @@ function onClientConnect(socket) {
         players.push(new Player(playerName, socket));
         console.log('New player registered: ' + playerName);
         socket.emit('registered', playerName);
+        io.emit('player list', playersToJSON());
     });
 
     socket.on('disconnect', function () {
@@ -40,10 +49,7 @@ function onClientConnect(socket) {
     });
 
     socket.on('request player list', function(){
-        var playersJSON = [];
-        players.forEach(function (player) {
-            playersJSON.push(player.toJSON());
-        });
+        var playersJSON = playersToJSON();
         console.log('request player list: ' + JSON.stringify(playersJSON));
         socket.emit('player list', playersJSON);
     });
