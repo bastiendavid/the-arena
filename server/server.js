@@ -22,6 +22,14 @@ function playersToJSON() {
     return playersJSON;
 }
 
+/**
+ * Returns a random integer between min and max
+ * Using Math.round() will give you a non-uniform distribution!
+ */
+function getRandomInt (min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
 function onClientConnect(socket) {
     console.log('a user connected');
     socket.on('user', function (username) {
@@ -51,13 +59,13 @@ function onClientConnect(socket) {
         });
     });
 
+
+    // Game communication
     socket.on('request player list', function(){
         var playersJSON = playersToJSON();
-        console.log('request player list: ' + JSON.stringify(playersJSON));
         socket.emit('player list', playersJSON);
     });
 
-    // Game communication
     socket.on('player position', function (playerName, position) {
         players.forEach(function (player) {
             if (player.name == playerName) {
@@ -66,6 +74,19 @@ function onClientConnect(socket) {
             }
         });
     });
+
+    socket.on('player die', function(playerName){
+        players.forEach(function (player) {
+            if (player.name == playerName) {
+                var newPosition = { x: getRandomInt(32, 750), y : 0};
+                console.log( 'player ' + playerName + ' die - new position ' + newPosition.x + ' - ' + newPosition.y);
+                player.updatePosition(newPosition);
+                return;
+            }
+        });
+        io.emit('player list', playersToJSON());
+    });
+
 
     // request players positions every 5 secs
     setInterval(function () {

@@ -65,11 +65,13 @@ Player.prototype.attack = function () {
     }
 
     if (minDistance < 50) {
-        // TODO: Manage Attack
-        console.log('I am attacking player : ' + playerNameToAttack);
+        this.game.players[otherPlayerName].hasBeenHitted();
     }
 };
 
+Player.prototype.hasBeenHitted = function () {
+    this.game.socket.emit('player die', this.name);
+};
 
 /**
 * Update the player object. Call at each frame.

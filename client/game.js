@@ -6,18 +6,23 @@ function Game(socket) {
     this.players = {};
     var self = this;
 
-    this.socket.on('player list', function(newPlayers) {
-        // add player if it does not exist
-        self.updatePlayers(newPlayers);
+    this.socket.on('player list', function(playersList) {
+        self.updatePlayers(playersList);
     });
 }
 
-Game.prototype.updatePlayers = function(newPlayers) {
+Game.prototype.updatePlayers = function(playersList) {
     var self = this;
-    newPlayers.forEach(function (newPlayer) {
-        if (!self.players[newPlayer.name]) {
-            self.addPlayer(newPlayer);
-            console.log('player registered : ' + newPlayer.name);
+    playersList.forEach(function (currentPlayer) {
+        if (!self.players[currentPlayer.name]) {
+            self.addPlayer(currentPlayer);
+            console.log('player registered : ' + currentPlayer.name);
+        }
+        else {
+            console.log('update position for : ' + currentPlayer.name);
+            if (currentPlayer.position){
+                self.players[currentPlayer.name].updatePosition(currentPlayer.position);
+            }
         }
     });
     // TODO: remove players that are now longer registered on the server
@@ -133,7 +138,6 @@ Game.prototype.update = function () {
     }
 
     if (this.attackButton.isDown && this.players[this.playerName].canAttack()) {
-        console.log('attackButton.isDown');
         postEvent = "attack";
     }
 
