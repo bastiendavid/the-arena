@@ -32,7 +32,7 @@ Game.prototype.play = function(playerName) {
         },
         create: function() {
             self.create();
-            self.socket.emit('request player list');
+            self.socket.emit('join game', self.playerName);
         },
         update: function() {
             self.update();
@@ -40,7 +40,6 @@ Game.prototype.play = function(playerName) {
     });
     this.listenEvents();
 
-    // send position when requested
     this.socket.on('request player position', function() {
         self.sendPlayerPosition();
     });

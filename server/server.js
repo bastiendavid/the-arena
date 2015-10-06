@@ -33,9 +33,12 @@ function onClientConnect(socket) {
     });
 
     socket.on('register', function (playerName) {
-        players.push(new Player(playerName, socket));
         console.log('New player registered: ' + playerName);
         socket.emit('registered', playerName);
+    });
+
+    socket.on('join game', function (playerName) {
+        players.push(new Player(playerName, socket));
         io.emit('player list', playersToJSON());
     });
 
