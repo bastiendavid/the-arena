@@ -99,11 +99,12 @@ Game.prototype.create = function () {
     this.jumpButton = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
     this.leftButton = this.game.input.keyboard.addKey(Phaser.Keyboard.Q);
     this.rightButton = this.game.input.keyboard.addKey(Phaser.Keyboard.D);
+    this.attackButton = this.game.input.keyboard.addKey(Phaser.Keyboard.J);
 
 };
 
 Game.prototype.addPlayer = function (player) {
-    var newPlayer = new Player(player.name, this.game);
+    var newPlayer = new Player(player.name, this);
     newPlayer.updatePosition(player.position);
     this.players[newPlayer.name] = newPlayer;
 };
@@ -130,6 +131,11 @@ Game.prototype.update = function () {
     if (this.jumpButton.isDown && this.players[this.playerName].canJump())
     {
         postEvent = "jump";
+    }
+
+    if (this.attackButton.isDown && this.players[this.playerName].canAttack()) {
+        console.log('attackButton.isDown');
+        postEvent = "attack";
     }
 
     // Send event to server

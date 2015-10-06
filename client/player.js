@@ -4,8 +4,8 @@ function Player(name, game) {
     this.name = name;
     this.game = game;
 
-    this.player = this.game.add.sprite(32, 32, 'dude');
-    this.game.physics.enable(this.player, Phaser.Physics.ARCADE);
+    this.player = this.game.game.add.sprite(32, 32, 'dude');
+    this.game.game.physics.enable(this.player, Phaser.Physics.ARCADE);
 
     this.player.body.collideWorldBounds = true;
     this.player.body.gravity.y = 1300;
@@ -19,6 +19,7 @@ function Player(name, game) {
     this.storedEvents = [];
     this.facing = 'left';
     this.jumpTimer = 0;
+    this.attackTimer = 0;
 }
 
 Player.prototype.getPosition = function () {
@@ -35,13 +36,40 @@ Player.prototype.addEvent = function (event) {
 };
 
 Player.prototype.canJump = function () {
-    return this.player.body.onFloor() && this.game.time.now > this.jumpTimer;
+    return this.player.body.onFloor() && this.game.game.time.now > this.jumpTimer;
 };
 
 Player.prototype.jump = function () {
     this.player.body.velocity.y = -500;
-    this.jumpTimer = this.game.time.now + 750;
+    this.jumpTimer = this.game.game.time.now + 750;
 };
+
+Player.prototype.canAttack = function () {
+    return this.game.game.time.now > this.attackTimer;
+};
+
+Player.prototype.attack = function () {
+    var minDistance = 600;
+    var currentDistance;
+    var playerNameToAttack;
+    this.attackTimer = this.game.game.time.now + 1500;
+
+    for (var otherPlayerName in this.game.players) {
+        if (otherPlayerName !== this.game.playerName) {
+            currentDistance = this.game.game.physics.arcade.distanceBetween(this.game.players[this.game.playerName].player, this.game.players[otherPlayerName].player)
+            if (currentDistance < minDistance) {
+                minDistance = currentDistance;
+                playerNameToAttack = otherPlayerName;
+            }
+        }
+    }
+
+    if (minDistance < 50) {
+        // TODO: Manage Attack
+        console.log('I am attacking player : ' + playerNameToAttack);
+    }
+};
+
 
 /**
 * Update the player object. Call at each frame.
@@ -102,5 +130,10 @@ Player.prototype.playEvent = function (event) {
     if (event == "jump")
     {
         this.jump();
+    }
+
+    if (event == "attack")
+    {
+        this.attack();
     }
 };
