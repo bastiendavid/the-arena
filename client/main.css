@@ -1,0 +1,10 @@
+.chat {
+    display: none;
+    margin-left: 50px;
+    height: 590px;
+    overflow: auto;
+}
+
+.chat form {
+    margin-left: 50px;
+}

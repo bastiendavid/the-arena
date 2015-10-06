@@ -4,26 +4,33 @@
 
 <head>
     <title>Welcome to The Arena</title>
+    <link rel="stylesheet" type="text/css" href="main.css" media="screen" />
 </head>
 
 <body>
-    <form action="">
-        <input id="m" autocomplete="off" />
-        <button>Send</button>
-    </form>
+    <div id="register">
+        <form id="play-form" action="">
+            <input id="name" autocomplete="off" />
+            <button>Play</button>
+        </form>
 
-    <form id="play-form" action="">
-        <input id="name" autocomplete="off" />
-        <button>Play</button>
-    </form>
+        <form id="spectate-form" action="">
+            <button>Spectate</button>
+        </form>
+    </div>
 
-    <form id="spectate-form" action="">
-        <button>Spectate</button>
-    </form>
+    <div id="game" style="float:left"></div>
 
-    <ul id="messages"></ul>
+    <div class="chat">
+        <form action="">
+            <input id="m" autocomplete="off" />
+            <button>Send</button>
+        </form>
 
-    <div id="game"></div>
+        <ul id="messages"></ul>
+    </div>
+
+
 
     <script src="/socket.io/socket.io.js"></script>
     <script src="/jquery/jquery.min.js"></script>
@@ -32,6 +39,7 @@
     <script src="/player.js"></script>
     <script src="/game.js"></script>
     <script>
+
     <!-- init sockets -->
     var socket = io();
     socket.emit('user', 'John Doe');
@@ -52,8 +60,8 @@
         var playerName = $('#name').val();
         socket.emit('register', playerName);
         socket.on('registered', function(playerName) {
-            $('#play-form').hide();
-            $('#spectate-form').hide();
+            $('#register').hide();
+            $('.chat').show();
             var game = new Game(socket);
             game.play(playerName);
         });
@@ -62,8 +70,8 @@
 
     <!-- Game spectate -->
     $('#spectate-form').submit(function () {
-        $('#play-form').hide();
-        $('#spectate-form').hide();
+        $('#register').hide();
+        $('.chat').show();
         var game = new Game(socket);
         game.spectate();
         return false;
