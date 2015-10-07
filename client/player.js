@@ -4,7 +4,7 @@ function Player(name, game) {
     this.name = name;
     this.game = game;
 
-    this.player = this.game.game.add.sprite(32, 32, 'dude');
+    this.player = this.game.game.add.sprite(40, 40, 'indiana');
     this.game.game.physics.enable(this.player, Phaser.Physics.ARCADE);
 
     this.player.body.collideWorldBounds = true;
@@ -12,9 +12,10 @@ function Player(name, game) {
     this.player.body.maxVelocity.y = 700;
     this.player.body.setSize(20, 32, 5, 16);
 
-    this.player.animations.add('left', [0, 1, 2, 3], 10, true);
-    this.player.animations.add('turn', [4], 20, true);
-    this.player.animations.add('right', [5, 6, 7, 8], 10, true);
+    this.player.animations.add('left', [12, 13, 14, 15, 16, 17, 18, 19, 20, 21], 30, true);
+    this.player.animations.add('right', [2, 3, 4, 5, 6, 7, 8, 9, 10, 11], 30, true);
+    this.player.animations.add('idle left', [1], 10, true);
+    this.player.animations.add('idle right', [0], 10, true);
 
     this.storedEvents = [];
     this.facing = 'left';
@@ -114,15 +115,13 @@ Player.prototype.playEvent = function (event) {
     {
         if (this.facing != 'idle')
         {
-            this.player.animations.stop();
-
             if (this.facing == 'left')
             {
-                this.player.frame = 0;
+                this.player.animations.play('idle left');
             }
             else
             {
-                this.player.frame = 5;
+                this.player.animations.play('idle right');
             }
 
             this.facing = 'idle';
