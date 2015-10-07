@@ -95,11 +95,11 @@ Player.prototype.attack = function () {
     }
 
     if (minDistance < 50) {
-        this.game.players[playerNameToAttack].hasBeenHitted();
+        this.game.players[playerNameToAttack].hasBeenHit();
     }
 };
 
-Player.prototype.hasBeenHitted = function () {
+Player.prototype.hasBeenHit = function () {
     this.game.socket.emit('player die', this.name);
 };
 
