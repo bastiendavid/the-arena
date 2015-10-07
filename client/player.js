@@ -4,7 +4,9 @@ function Player(name, game) {
     this.name = name;
     this.game = game;
 
-    this.player = this.game.game.add.sprite(40, 40, 'indiana');
+    var model = this.pickPlayerModel();
+
+    this.player = this.game.game.add.sprite(40, 40, model);
     this.game.game.physics.enable(this.player, Phaser.Physics.ARCADE);
 
     this.player.body.collideWorldBounds = true;
@@ -12,16 +14,43 @@ function Player(name, game) {
     this.player.body.maxVelocity.y = 700;
     this.player.body.setSize(20, 32, 5, 16);
 
-    this.player.animations.add('left', [12, 13, 14, 15, 16, 17, 18, 19, 20, 21], 30, true);
-    this.player.animations.add('right', [2, 3, 4, 5, 6, 7, 8, 9, 10, 11], 30, true);
-    this.player.animations.add('idle left', [1], 10, true);
-    this.player.animations.add('idle right', [0], 10, true);
+    this.initAnims(model);
 
     this.storedEvents = [];
     this.facing = 'left';
     this.jumpTimer = 0;
     this.attackTimer = 0;
 }
+
+function getRandomInt(min, max) {
+  return Math.floor(Math.random() * (max - min)) + min;
+}
+
+Player.prototype.pickPlayerModel = function () {
+    if (getRandomInt(0, 100)%2 == 0) {
+        return 'lara';
+    } else {
+        return 'indiana';
+    }
+};
+
+Player.prototype.initAnims = function (model) {
+    if (model === 'indiana') {
+        this.player.animations.add('left', [12, 13, 14, 15, 16, 17, 18, 19, 20, 21], 30, true);
+        this.player.animations.add('right', [2, 3, 4, 5, 6, 7, 8, 9, 10, 11], 30, true);
+        this.player.animations.add('idle left', [1], 10, true);
+        this.player.animations.add('idle right', [0], 10, true);
+        return;
+    }
+
+    if (model === 'lara') {
+        this.player.animations.add('left', [10, 11, 12, 13, 14, 15, 16, 17], 30, true);
+        this.player.animations.add('right', [2, 3, 4, 5, 6, 7, 8, 9], 30, true);
+        this.player.animations.add('idle left', [1], 10, true);
+        this.player.animations.add('idle right', [0], 10, true);
+        return;
+    }
+};
 
 Player.prototype.getPosition = function () {
     return this.player.position;
