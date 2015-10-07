@@ -143,7 +143,7 @@ Game.prototype.update = function () {
 
     // Send event to server
     if (postEvent != undefined) {
-        this.socket.emit('event', new Event(this.playerName, postEvent));
+        this.socket.emit('event', new Event(this.playerName, postEvent, this.players[this.playerName].position));
     }
 };
 

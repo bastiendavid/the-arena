@@ -95,6 +95,12 @@ function onClientConnect(socket) {
 
     // send events to players
     socket.on('event', function (event) {
+        players.forEach(function (player) {
+            if (player.name == event.playerName) {
+                player.updatePosition(event.position);
+                return;
+            }
+        });
         io.emit('event', event);
     });
 }
