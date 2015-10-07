@@ -31,7 +31,7 @@ Game.prototype.updatePlayers = function(playersList) {
 Game.prototype.play = function(playerName) {
     var self = this;
     this.playerName = playerName;
-    this.game = new Phaser.Game(800, 600, Phaser.AUTO, 'game', {
+    this.game = new Phaser.Game(800, 608, Phaser.AUTO, 'game', {
         preload: function() {
             self.preload();
         },
@@ -59,7 +59,7 @@ Game.prototype.sendPlayerPosition = function () {
 
 Game.prototype.spectate = function () {
     var self = this;
-    this.game = new Phaser.Game(800, 600, Phaser.AUTO, 'game', {
+    this.game = new Phaser.Game(800, 608, Phaser.AUTO, 'game', {
         preload: function() {
             self.preload();
         },
@@ -97,7 +97,7 @@ Game.prototype.create = function () {
     this.layerCol = map.createLayer('collisions');
     // uncomment to display collisions boxes
     //this.layerCol.debug = true;
-    map.setCollisionBetween(0, 600, true, 'collisions');
+    map.setCollisionBetween(0, 608, true, 'collisions');
     this.layer.resizeWorld();
 
     this.jumpButton = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
