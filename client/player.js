@@ -95,7 +95,7 @@ Player.prototype.attack = function () {
     }
 
     if (minDistance < 50) {
-        this.game.players[otherPlayerName].hasBeenHitted();
+        this.game.players[playerNameToAttack].hasBeenHitted();
     }
 };
 
