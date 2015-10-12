@@ -98,7 +98,7 @@ Player.prototype.canJump = function () {
 
 Player.prototype.jump = function () {
     this.player.body.velocity.y = -500;
-    this.jumpTimer = this.game.game.time.now + 750;
+    this.jumpTimer = this.game.game.time.now + 300;
 };
 
 Player.prototype.canAttack = function () {
