@@ -171,7 +171,7 @@ Player.prototype.update = function () {
 
     var event;
     if (this.storedEvents.length > 0) {
-        event = this.storedEvents.splice(0,1);
+        event = this.storedEvents.splice(0,1)[0];
     }
     this.playEvent(event);
 };
@@ -180,7 +180,7 @@ Player.prototype.update = function () {
 * Play an event, to update the player state.
 */
 Player.prototype.playEvent = function (event) {
-    if (event == "left")
+    if (event != undefined && event.event == 'left')
     {
         this.player.body.velocity.x = -300;
 
@@ -191,7 +191,7 @@ Player.prototype.playEvent = function (event) {
             this.idle = false;
         }
     }
-    else if (event == "right")
+    else if (event != undefined && event.event == 'right')
     {
         this.player.body.velocity.x = 300;
 
@@ -219,12 +219,12 @@ Player.prototype.playEvent = function (event) {
         }
     }
 
-    if (event == "jump")
+    if (event != undefined && event.event == 'jump')
     {
         this.jump();
     }
 
-    if (event == "attack")
+    if (event != undefined && event.event == 'attack')
     {
         this.attack();
     }

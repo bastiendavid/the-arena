@@ -77,7 +77,7 @@ Game.prototype.spectate = function () {
 Game.prototype.listenEvents = function () {
     var self = this;
     this.socket.on('event', function (event) {
-        self.players[event.playerName].addEvent(event.event);
+        self.players[event.playerName].addEvent(event);
     });
 };
 
