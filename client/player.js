@@ -110,12 +110,20 @@ Player.prototype.attack = function () {
         }
     }
 
-    if (minDistance < 50) {
+    if (minDistance < 50 && this.isFacing(playerNameToAttack)) {
         this.game.players[playerNameToAttack].hasBeenHit();
     }
 
     // slash animation
     this.doSlashEffect();
+};
+
+Player.prototype.isFacing = function (otherPlayerName) {
+  console.log('is facing: ');
+  console.log('this.game.players[this.game.playerName].facing = ' + this.game.players[this.game.playerName].facing);
+  console.log('')
+  return this.game.players[this.game.playerName].facing == 'left' && this.game.players[this.game.playerName].player.position.x > this.game.players[otherPlayerName].player.position.x ||
+         this.game.players[this.game.playerName].facing == 'right' && this.game.players[this.game.playerName].player.position.x < this.game.players[otherPlayerName].player.position.x;
 };
 
 Player.prototype.doSlashEffect = function () {
