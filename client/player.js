@@ -20,6 +20,7 @@ function Player(name, game) {
 
     this.storedEvents = [];
     this.facing = 'left';
+    this.idle = true;
     this.jumpTimer = 0;
     this.attackTimer = 0;
 }
@@ -150,25 +151,27 @@ Player.prototype.playEvent = function (event) {
     {
         this.player.body.velocity.x = -300;
 
-        if (this.facing != 'left')
+        if (this.facing != 'left' || this.idle)
         {
             this.player.animations.play('left');
             this.facing = 'left';
+            this.idle = false;
         }
     }
     else if (event == "right")
     {
         this.player.body.velocity.x = 300;
 
-        if (this.facing != 'right')
+        if (this.facing != 'right' || this.idle)
         {
             this.player.animations.play('right');
             this.facing = 'right';
+            this.idle = false;
         }
     }
     else
     {
-        if (this.facing != 'idle')
+        if (!this.idle)
         {
             if (this.facing == 'left')
             {
@@ -179,7 +182,7 @@ Player.prototype.playEvent = function (event) {
                 this.player.animations.play('idle right');
             }
 
-            this.facing = 'idle';
+            this.idle = true;
         }
     }
 
