@@ -10,6 +10,7 @@ function Player(name, game) {
     this.game.game.physics.enable(this.player, Phaser.Physics.ARCADE);
 
     this.initSlashAnim();
+    this.initBloodAnim();
 
     this.player.body.collideWorldBounds = true;
     this.player.body.gravity.y = 1300;
@@ -63,9 +64,19 @@ Player.prototype.initSlashAnim = function () {
   var self = this;
   var endAnim = function() {
     self.slash.visible = false;
-  }
+  };
   this.slash.animations.getAnimation('slash right').onComplete.dispatch = endAnim;
   this.slash.animations.getAnimation('slash left').onComplete.dispatch = endAnim;
+};
+
+Player.prototype.initBloodAnim = function () {
+  this.blood = this.game.game.add.sprite(0, 0, 'blood');
+  this.blood.visible = false;
+  this.blood.animations.add('blood', [0, 1, 2, 3, 4], 20, false);
+  var self = this;
+  this.blood.animations.getAnimation('blood').onComplete.dispatch = function() {
+    self.blood.visible = false;
+  };
 };
 
 Player.prototype.getPosition = function () {
@@ -140,7 +151,16 @@ Player.prototype.doSlashEffect = function () {
 };
 
 Player.prototype.hasBeenHit = function () {
+    this.doBloodEffect();
     this.game.socket.emit('player die', this.name);
+};
+
+Player.prototype.doBloodEffect = function () {
+  this.blood.visible = true;
+  this.blood.position.x = this.player.position.x;
+  this.blood.position.y = this.player.position.y;
+  this.blood.bringToTop();
+  this.blood.animations.play('blood');
 };
 
 /**
