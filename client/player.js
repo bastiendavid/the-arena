@@ -9,6 +9,8 @@ function Player(name, game) {
     this.player = this.game.game.add.sprite(40, 40, model);
     this.game.game.physics.enable(this.player, Phaser.Physics.ARCADE);
 
+    this.initSlashAnim();
+
     this.player.body.collideWorldBounds = true;
     this.player.body.gravity.y = 1300;
     this.player.body.maxVelocity.y = 700;
@@ -50,6 +52,16 @@ Player.prototype.initAnims = function (model) {
         this.player.animations.add('idle right', [0], 10, true);
         return;
     }
+};
+
+Player.prototype.initSlashAnim = function () {
+  this.slash = this.game.game.add.sprite(0, 0, 'slash');
+  this.slash.visible = false;
+  this.slash.animations.add('slash', [0, 1, 2, 3, 4, 5], 30, false);
+  var self = this;
+  this.slash.animations.getAnimation('slash').onComplete.dispatch = function() {
+    self.slash.visible = false;
+  };
 };
 
 Player.prototype.getPosition = function () {
@@ -97,6 +109,20 @@ Player.prototype.attack = function () {
     if (minDistance < 50) {
         this.game.players[playerNameToAttack].hasBeenHit();
     }
+
+    // slash animation
+    this.doSlashEffect();
+};
+
+Player.prototype.doSlashEffect = function () {
+  this.slash.visible = true;
+  this.slash.animations.play('slash');
+  var slashDelta = 30;
+  if (this.facing == 'left') {
+    slashDelta = -30;
+  }
+  this.slash.position.x = this.player.position.x + slashDelta;
+  this.slash.position.y = this.player.position.y;
 };
 
 Player.prototype.hasBeenHit = function () {

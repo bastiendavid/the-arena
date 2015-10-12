@@ -84,6 +84,7 @@ Game.prototype.listenEvents = function () {
 Game.prototype.preload = function () {
     this.game.load.spritesheet('indiana', 'assets/indiana.png', 39, 48);
     this.game.load.spritesheet('lara', 'assets/lara.png', 57, 48);
+    this.game.load.spritesheet('slash', 'assets/slash.png', 48, 48);
     this.game.load.image('background_image', 'assets/background.png');
     this.collisions = this.game.load.tilemap('level', 'assets/level1.json', null, Phaser.Tilemap.TILED_JSON);
 };
