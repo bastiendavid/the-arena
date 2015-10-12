@@ -151,14 +151,15 @@ Player.prototype.doSlashEffect = function () {
 };
 
 Player.prototype.hasBeenHit = function () {
-    this.doBloodEffect();
+    // doing this will cause the player to die one frame later on all screens (it's ok - since only one event is played by frame, and in this case, 2 events are sent in the same frame: attack and die)
+    this.game.socket.emit('event', new Event(this.name, 'die', this.player.position));
     this.game.socket.emit('player die', this.name);
 };
 
-Player.prototype.doBloodEffect = function () {
+Player.prototype.doBloodEffect = function (position) {
   this.blood.visible = true;
-  this.blood.position.x = this.player.position.x;
-  this.blood.position.y = this.player.position.y;
+  this.blood.position.x = position.x;
+  this.blood.position.y = position.y;
   this.blood.bringToTop();
   this.blood.animations.play('blood');
 };
@@ -227,5 +228,9 @@ Player.prototype.playEvent = function (event) {
     if (event != undefined && event.event == 'attack')
     {
         this.attack();
+    }
+
+    if (event != undefined && event.event == 'die') {
+        this.doBloodEffect(event.position);
     }
 };
