@@ -58,11 +58,14 @@ Player.prototype.initAnims = function (model) {
 Player.prototype.initSlashAnim = function () {
   this.slash = this.game.game.add.sprite(0, 0, 'slash');
   this.slash.visible = false;
-  this.slash.animations.add('slash', [0, 1, 2, 3, 4, 5], 30, false);
+  this.slash.animations.add('slash right', [0, 1, 2, 3, 4, 5], 30, false);
+  this.slash.animations.add('slash left', [11, 10, 9, 8, 7, 6], 30, false);
   var self = this;
-  this.slash.animations.getAnimation('slash').onComplete.dispatch = function() {
+  var endAnim = function() {
     self.slash.visible = false;
-  };
+  }
+  this.slash.animations.getAnimation('slash right').onComplete.dispatch = endAnim;
+  this.slash.animations.getAnimation('slash left').onComplete.dispatch = endAnim;
 };
 
 Player.prototype.getPosition = function () {
@@ -117,13 +120,15 @@ Player.prototype.attack = function () {
 
 Player.prototype.doSlashEffect = function () {
   this.slash.visible = true;
-  this.slash.animations.play('slash');
   var slashDelta = 30;
+  var slashAnim = 'slash right';
   if (this.facing == 'left') {
     slashDelta = -30;
+    var slashAnim = 'slash left';
   }
   this.slash.position.x = this.player.position.x + slashDelta;
   this.slash.position.y = this.player.position.y;
+  this.slash.animations.play(slashAnim);
 };
 
 Player.prototype.hasBeenHit = function () {
