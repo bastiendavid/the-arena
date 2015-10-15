@@ -22,7 +22,7 @@
     <div id="game" style="float:left"></div>
 
     <div class="chat">
-        <form action="">
+        <form id="chat-form" action="">
             <input id="m" autocomplete="off" />
             <button>Send</button>
         </form>
@@ -42,10 +42,9 @@
 
     <!-- init sockets -->
     var socket = io();
-    socket.emit('user', 'John Doe');
 
     <!-- Chat -->
-    $('form').submit(function () {
+    $('#chat-form').submit(function () {
         socket.emit('message', $('#m').val());
         $('#m').val('');
         return false;

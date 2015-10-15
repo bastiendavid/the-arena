@@ -32,9 +32,6 @@ function getRandomInt (min, max) {
 
 function onClientConnect(socket) {
     console.log('a user connected');
-    socket.on('user', function (username) {
-        io.emit('message', username + ' entered the room');
-    })
 
     socket.on('message', function (message) {
         io.emit('message', message);
@@ -43,6 +40,7 @@ function onClientConnect(socket) {
     socket.on('register', function (playerName) {
         console.log('New player registered: ' + playerName);
         socket.emit('registered', playerName);
+        io.emit('message', playerName + ' entered the room');
     });
 
     socket.on('join game', function (playerName) {
@@ -54,6 +52,7 @@ function onClientConnect(socket) {
         players.forEach(function (player) {
             if (player.socket == socket) {
                 console.log('Player disconnected: ' + player.name);
+                io.emit('message', player.name + ' left the room');
                 return;
             }
         });
