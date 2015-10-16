@@ -234,3 +234,7 @@ Player.prototype.playEvent = function (event) {
         this.doBloodEffect(event.position);
     }
 };
+
+Player.prototype.remove = function () {
+    this.player.destroy();
+};

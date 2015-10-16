@@ -13,6 +13,7 @@ function Game(socket) {
 
 Game.prototype.updatePlayers = function(playersList) {
     var self = this;
+    // add new players that registered
     playersList.forEach(function (currentPlayer) {
         if (!self.players[currentPlayer.name]) {
             self.addPlayer(currentPlayer);
@@ -25,7 +26,20 @@ Game.prototype.updatePlayers = function(playersList) {
             }
         }
     });
-    // TODO: remove players that are now longer registered on the server
+    // remove players that are now longer registered on the server
+    for (var playerName in this.players) {
+        var found = false;
+        playersList.forEach(function (currentPlayer) {
+            if (currentPlayer.name == playerName) {
+                found = true;
+                return;
+            }
+        });
+        if (!found) {
+            this.players[playerName].remove();
+            delete this.players[playerName];
+        }
+    }
 }
 
 Game.prototype.play = function(playerName) {

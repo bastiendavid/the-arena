@@ -53,6 +53,8 @@ function onClientConnect(socket) {
             if (player.socket == socket) {
                 console.log('Player disconnected: ' + player.name);
                 io.emit('message', player.name + ' left the room');
+                players.splice(players.indexOf(player), 1);
+                io.emit('player list', playersToJSON());
                 return;
             }
         });
